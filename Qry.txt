@@ -1,0 +1,154 @@
+CREATE DATABASE HMS
+    WITH 
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    CONNECTION LIMIT = -1;
+
+
+CREATE TABLE public.patient_details
+(
+    id serial NOT NULL,
+    patient_id character varying(10) NOT NULL,
+    first_name character varying(30),
+    last_name character varying(30),
+    contact_number character varying(15),
+    ph_number character varying(15),
+    postal_code character varying(20),
+    address character varying(100),
+    city character varying(20),
+    country character varying(20),
+    nic character varying(11),    
+    CONSTRAINT primary_key PRIMARY KEY (id),
+    CONSTRAINT u_patient UNIQUE (patient_id)
+);
+
+ALTER TABLE public.patient_details
+    OWNER to postgres;
+
+
+CREATE TABLE public.user_details
+(
+    id serial NOT NULL,
+    user_name character varying(10) NOT NULL,
+    first_name character varying(30),
+    last_name character varying(30),
+    user_password character varying(15),
+    user_role character varying(15),  
+    CONSTRAINT primary_key_user PRIMARY KEY (id),
+    CONSTRAINT u_user UNIQUE (user_name)
+);
+
+ALTER TABLE public.user_details
+    OWNER to postgres;
+
+
+CREATE TABLE public.record_sheet_details
+(
+    id serial NOT NULL,
+    patient_id character varying(10) NOT NULL,
+    record_date date,
+    record_details character varying(300),
+    updated_user character varying(15),
+    CONSTRAINT primary_key_record_sheet PRIMARY KEY (id),
+    CONSTRAINT f_record FOREIGN KEY (patient_id)
+        REFERENCES public.patient_details (patient_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+);
+
+ALTER TABLE public.record_sheet_details
+    OWNER to postgres;
+
+
+CREATE TABLE public.bed_details
+(
+    id serial NOT NULL,
+    bed_number character varying(10) NOT NULL,
+    bed_occupied boolean,
+    last_updated_date date,
+    updated_user character varying(15),
+    CONSTRAINT primary_key_bed_details PRIMARY KEY (id),
+    CONSTRAINT u_bed UNIQUE (bed_number)
+);
+
+ALTER TABLE public.bed_details
+    OWNER to postgres;
+
+
+CREATE TABLE public.doctor_details
+(
+    id serial NOT NULL,
+    doctor_id character varying(10) NOT NULL,
+    first_name character varying(30),
+    last_name character varying(30),
+    last_updated_date date,
+    updated_user character varying(15),
+    CONSTRAINT primary_key_doctor_details PRIMARY KEY (id),
+    CONSTRAINT u_doctor UNIQUE (doctor_id)
+);
+
+ALTER TABLE public.doctor_details
+    OWNER to postgres;
+
+
+CREATE TABLE public.ward_details
+(
+    id serial NOT NULL,
+    ward_id character varying(10) NOT NULL,
+    ward_name character varying(30),
+    last_updated_date date,
+    updated_user character varying(15),
+    CONSTRAINT primary_key_ward_details PRIMARY KEY (id),
+    CONSTRAINT u_ward UNIQUE (ward_id)
+);
+
+ALTER TABLE public.ward_details
+    OWNER to postgres;
+
+
+
+CREATE TABLE public.patient_other_details
+(
+    id serial NOT NULL,
+    patient_id character varying(10),
+    bed_number character varying(10),
+    doctor_id character varying(10),
+    ward_id character varying(10),
+    updated_date date,
+    updated_user character varying(10),
+    CONSTRAINT primary_key_patient_other PRIMARY KEY (patient_id),
+    CONSTRAINT f_patient FOREIGN KEY (patient_id)
+        REFERENCES public.patient_details (patient_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
+    CONSTRAINT f_bed FOREIGN KEY (bed_number)
+        REFERENCES public.bed_details (bed_number) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
+    CONSTRAINT f_doctor FOREIGN KEY (doctor_id)
+        REFERENCES public.doctor_details (doctor_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
+    CONSTRAINT f_ward FOREIGN KEY (ward_id)
+        REFERENCES public.ward_details (ward_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+);
+
+ALTER TABLE public.patient_other_details
+    OWNER to postgres;
+
+
+
+
+
+ALTER TABLE public.ward_details
+    ALTER COLUMN last_updated_date TYPE serial COLLATE pg_catalog."default"; ;
+
+ALTER TABLE public.ward_details
+    ALTER COLUMN last_updated_date TYPE serial;
